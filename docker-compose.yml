@@ -1,24 +1,36 @@
+version: '3.8'
+
 services:
   servicea:
     build:
-      context: https://Aditya-Varun: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@github.com/Aditya-Varun/servicea.git
-      dockerfile: servicea/Dockerfile  # Adjust the path if necessary
+      context: .  # The root of your repository
+      dockerfile: servicea/Dockerfile  # Path to the Dockerfile for servicea
     container_name: servicea
     ports:
       - "8001:8001"
+    networks:
+      - app-network
 
   serviceb:
     build:
-      context: https://Aditya-Varun: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@github.com/Aditya-Varun/serviceb.git
-      dockerfile: serviceb/Dockerfile  # Adjust the path if necessary
+      context: .  # The root of your repository
+      dockerfile: serviceb/Dockerfile  # Path to the Dockerfile for serviceb
     container_name: serviceb
     ports:
       - "8002:8002"
+    networks:
+      - app-network
 
   servicec:
     build:
-      context: https://Aditya-Varun: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@github.com/Aditya-Varun/servicec.git
-      dockerfile: servicec/Dockerfile  # Adjust the path if necessary
+      context: .  # The root of your repository
+      dockerfile: servicec/Dockerfile  # Path to the Dockerfile for servicec
     container_name: servicec
     ports:
       - "8003:8003"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
