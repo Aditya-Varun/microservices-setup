@@ -17,8 +17,13 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    // Build Docker images for all services
-                    sh "docker-compose -f docker-compose.yml build"
+                    try {
+                        // Build Docker images for all services
+                        sh "docker-compose -f docker-compose.yml build"
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
                 }
             }
         }
@@ -26,16 +31,23 @@ pipeline {
         stage('Run Integration Tests') {
             steps {
                 script {
-                    // Start all services using Docker Compose
-                    sh "docker-compose -f docker-compose.yml up -d"
-                    
-                    // Run your integration tests here (e.g., using curl or a testing script)
-                    // Example:
-                    // sh 'curl http://localhost:8001/healthcheck'
-                    // sh 'curl http://localhost:8002/healthcheck'
-                    // sh 'curl http://localhost:8003/healthcheck'
-                    
-                    // Optionally: Run your test suite against the services running on docker-compose
+                    try {
+                        // Start all services using Docker Compose
+                        sh "docker-compose -f docker-compose.yml up -d"
+                        
+                        // Wait for services to be fully up (adjust sleep time if needed)
+                        sleep 30  // Optional: wait for services to start properly
+
+                        // Run your integration tests here (e.g., using curl or a testing script)
+                        // Example:
+                        sh 'curl -f http://localhost:8001/healthcheck || exit 1'
+                        sh 'curl -f http://localhost:8002/healthcheck || exit 1'
+                        sh 'curl -f http://localhost:8003/healthcheck || exit 1'
+
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
                 }
             }
         }
@@ -43,8 +55,13 @@ pipeline {
         stage('Tear Down') {
             steps {
                 script {
-                    // Stop the services
-                    sh "docker-compose -f docker-compose.yml down"
+                    try {
+                        // Stop and remove the services (containers)
+                        sh "docker-compose -f docker-compose.yml down --volumes --remove-orphans"
+                    } catch (Exception e) {
+                        currentBuild.result = 'FAILURE'
+                        throw e
+                    }
                 }
             }
         }
@@ -52,8 +69,14 @@ pipeline {
 
     post {
         always {
-            // Clean up Docker images if needed
+            // Clean up Docker images, containers, volumes, etc. after the build
             sh "docker system prune -f"
+        }
+        success {
+            echo 'The pipeline completed successfully.'
+        }
+        failure {
+            echo 'The pipeline failed. Please check the logs for more details.'
         }
     }
 }
