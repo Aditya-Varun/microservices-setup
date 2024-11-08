@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        // Optional: Define environment variables here
-    }
-
     stages {
         stage('Clone Repositories') {
             steps {
