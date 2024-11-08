@@ -1,0 +1,24 @@
+services:
+  servicea:
+    build:
+      context: https://Aditya-Varun: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@github.com/Aditya-Varun/servicea.git
+      dockerfile: servicea/Dockerfile  # Adjust the path if necessary
+    container_name: servicea
+    ports:
+      - "8001:8001"
+
+  serviceb:
+    build:
+      context: https://Aditya-Varun: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@github.com/Aditya-Varun/serviceb.git
+      dockerfile: serviceb/Dockerfile  # Adjust the path if necessary
+    container_name: serviceb
+    ports:
+      - "8002:8002"
+
+  servicec:
+    build:
+      context: https://Aditya-Varun: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@github.com/Aditya-Varun/servicec.git
+      dockerfile: servicec/Dockerfile  # Adjust the path if necessary
+    container_name: servicec
+    ports:
+      - "8003:8003"
